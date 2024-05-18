@@ -1,0 +1,10 @@
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    register-with-eureka: false #// to avoid self registration    
+    fetch-registry: false # Indicates whether this client should fetch eureka registry information from eureka server.
+
+server:
+  port: 8761
+    

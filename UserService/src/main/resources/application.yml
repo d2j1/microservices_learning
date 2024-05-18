@@ -1,0 +1,81 @@
+
+server:
+  port: 8081
+  
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/microservices
+    username: student
+    password: 2151
+    
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true  
+    properties:
+      hiberante:
+      dialect: org.hibernate.dialect.MySQL8Dialect
+  application:
+    name: USER-SERVICE
+  profiles:
+    active: prod
+
+  config:
+    import: configserver:http://localhost:8085
+  
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+      
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+  endpoint:
+    health:
+      show-details: always
+      
+resilience4j:
+  circuitbreaker:
+    instances:
+      ratingHotelBreaker:
+        register-health-indicator: true
+        event-consumer-buffer-size: 10
+        failure-rate-threshold: 50 # 50 % is the value provided
+        minimum-number-of-calls: 5
+        automatic-transition-from-open-to-half-open-enabled: true
+        wait-duration-in-open-state: 6  # 6 seconds
+        permitted-number-of-calls-in-half-open-state: 3
+        sliding-window-size: 10
+        sliding-window-type: count-based
+  retry:
+    instances:
+      ratingHotelRetryService:
+        max-attempts: 3
+        wait-duration: 2 # seconds
+    
+  ratelimiter:
+    instances:
+      userRateLimiter:
+        limit-refresh-period: 4s # seconds
+        limit-for-period: 2 # only 2 requests are allowed in 4 seconds
+        timeout-duration: 0s # 
+        
+      
+        
+# as we are fetching below properties from the server so commented      
+#eureka:
+#  client:
+#    fetch-registry: true
+#    register-with-eureka: true
+#    service-url:
+#      defaultZone: http://localhost:8761/eureka
+#  instance:
+#    prefer-ip-address: true
+    
+    
+    
+    
